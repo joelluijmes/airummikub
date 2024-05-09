@@ -1,4 +1,5 @@
 import sys
+from typing import Literal
 import pygame
 import random
 
@@ -29,9 +30,15 @@ class Paddle(pygame.sprite.Sprite):
     def update(self):
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_UP] and self.rect.y > WALL_WIDTH:
+        if keys[pygame.K_UP]:
+            self.move("up")
+        if keys[pygame.K_DOWN]:
+            self.move("down")
+
+    def move(self, direction: Literal["up", "down"]):
+        if direction == "up" and self.rect.y > WALL_WIDTH:
             self.rect.y -= self.SPEED
-        if keys[pygame.K_DOWN] and self.rect.y < HEIGHT - self.rect.height - WALL_WIDTH:
+        if direction == "down" and self.rect.y < HEIGHT - self.rect.height - WALL_WIDTH:
             self.rect.y += self.SPEED
 
 
@@ -48,18 +55,13 @@ class Wall(pygame.sprite.Sprite):
 
 
 class Ball(pygame.sprite.Sprite):
-    def __init__(self, color, radius, x, y):
+    def __init__(self, color, radius):
         super().__init__()
 
         self.image = pygame.Surface([radius * 2, radius * 2])
         pygame.draw.circle(self.image, color, (radius, radius), radius)
 
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-
-        # self.speed = random.choice([[5, 5], [-5, 5], [5, -5], [-5, -5]])
-        self.speed = [0, 0]
 
     def update(self):
         self.rect = self.rect.move(self.speed)
@@ -71,7 +73,7 @@ class Game:
         self.clock = pygame.time.Clock()
 
         self.paddle = Paddle(color=WHITE, width=10, height=50, left_position=PADDLE_OFFSET)
-        self.ball = Ball(color=WHITE, radius=10, x=WIDTH // 2, y=HEIGHT // 2)
+        self.ball = Ball(color=WHITE, radius=10)
         self.wall_top = Wall(color=WHITE, width=WIDTH, height=WALL_WIDTH, x=0, y=0)
         self.wall_bottom = Wall(color=WHITE, width=WIDTH, height=WALL_WIDTH, x=0, y=HEIGHT - 10)
         self.wall_right = Wall(color=WHITE, width=WALL_WIDTH, height=HEIGHT, x=WIDTH - WALL_WIDTH, y=0)
@@ -85,35 +87,51 @@ class Game:
         )
 
         self.framerate = framerate
+        self.reset()
+
+    def reset(self):
+        self.completed = False
+        self.num_ticks = 0
+        self.num_paddle_hits = 0
+
+        self.paddle.rect.y = HEIGHT // 2 - self.paddle.rect.height // 2
+        self.ball.rect.x = WIDTH // 2
+        self.ball.rect.y = HEIGHT // 2
+        self.ball.speed = random.choice([[5, 5], [-5, 5], [5, -5], [-5, -5]])
 
     def run(self):
         while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit()
-
-            # Check for game over
-            if self.ball.rect.left < 0:
-                self.screen.fill(color=RED)
-                pygame.display.flip()
-                self.clock.tick(60)
-                continue
-
-            # Check for collisions
-            if pygame.sprite.spritecollide(self.ball, [self.wall_right], False):
-                self.ball.speed[0] *= -1
-            if pygame.sprite.spritecollide(self.ball, [self.wall_top, self.wall_bottom], False):
-                self.ball.speed[1] *= -1
-            if pygame.sprite.spritecollide(self.ball, [self.paddle], False):
-                self.ball.speed[0] *= -1
-
-            # Redraw the screen
-            self.sprites.update()
-            self.screen.fill(color=BLACK)
-            self.sprites.draw(self.screen)
-
-            pygame.display.flip()
+            self.tick()
             self.clock.tick(self.framerate)
+
+    def tick(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+
+        # Check for game over
+        if self.ball.rect.left < 0:
+            self.screen.fill(color=RED)
+            pygame.display.flip()
+            self.completed = True
+            return
+
+        # Check for collisions
+        if pygame.sprite.spritecollide(self.ball, [self.wall_right], False):
+            self.ball.speed[0] *= -1
+        if pygame.sprite.spritecollide(self.ball, [self.wall_top, self.wall_bottom], False):
+            self.ball.speed[1] *= -1
+        if pygame.sprite.spritecollide(self.ball, [self.paddle], False):
+            self.ball.speed[0] *= -1
+            self.num_paddle_hits += 1
+
+        # Redraw the screen
+        self.sprites.update()
+        self.screen.fill(color=BLACK)
+        self.sprites.draw(self.screen)
+
+        pygame.display.flip()
+        self.num_ticks += 1
 
 
 def main():
