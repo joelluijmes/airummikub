@@ -69,7 +69,10 @@ class Ball(pygame.sprite.Sprite):
 
 class Game:
     def __init__(self, framerate=60):
+        pygame.init()
+
         self.screen = pygame.display.set_mode(SIZE)
+        self.font = pygame.font.Font(None, 24)
         self.clock = pygame.time.Clock()
 
         self.paddle = Paddle(color=WHITE, width=10, height=50, left_position=PADDLE_OFFSET)
@@ -87,12 +90,16 @@ class Game:
         )
 
         self.framerate = framerate
+        self.score = 0
+        self.top_score = 0
+
         self.reset()
 
     def reset(self):
         self.completed = False
         self.num_ticks = 0
         self.num_paddle_hits = 0
+        self.score = 0
 
         self.paddle.rect.y = HEIGHT // 2 - self.paddle.rect.height // 2
         self.ball.rect.x = WIDTH // 2
@@ -130,13 +137,20 @@ class Game:
         self.screen.fill(color=BLACK)
         self.sprites.draw(self.screen)
 
+        # Render stats
+        self.score = self.num_paddle_hits * self.framerate + self.num_ticks // self.framerate
+        score_text = self.font.render(f"Score:         {self.score:09d}", True, WHITE)
+        self.screen.blit(score_text, (10, 10))
+
+        self.top_score = max(self.score, self.top_score)
+        top_score_text = self.font.render(f"Top Score: {self.top_score:09d}", True, WHITE)
+        self.screen.blit(top_score_text, (10, 25))
+
         pygame.display.flip()
         self.num_ticks += 1
 
 
 def main():
-    pygame.init()
-
     game = Game()
     game.run()
 

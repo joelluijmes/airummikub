@@ -4,12 +4,9 @@ from .base import BaseAgent
 
 
 class RandomAgent(BaseAgent):
-    def run_game(self, game: Game, framerate: int) -> int:
-        score = 0
-
+    def run_game(self, game: Game, framerate: int):
         while not game.completed:
             game.tick()
-            score = game.num_paddle_hits * framerate + game.num_ticks // framerate
 
             direction = random.choice(["up", "down", None])
             if direction is not None:
@@ -17,8 +14,6 @@ class RandomAgent(BaseAgent):
 
             if framerate:
                 game.clock.tick(framerate)
-
-        return score
 
 
 if __name__ == "__main__":
