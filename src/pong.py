@@ -138,7 +138,7 @@ class Game:
         self.sprites.draw(self.screen)
 
         # Render stats
-        self.score = self.num_paddle_hits * self.framerate + self.num_ticks // self.framerate
+        self.score = self.num_paddle_hits * 50 + self.num_ticks // 50
         score_text = self.font.render(f"Score:         {self.score:09d}", True, WHITE)
         self.screen.blit(score_text, (10, 10))
 

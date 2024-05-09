@@ -9,11 +9,17 @@ class BaseAgent:
 
     def run_simulation(self, num_games: int):
         scores = []
-        framerate = 60
+        framerate = 1000
         game = Game(framerate=framerate)
 
         for _ in range(num_games):
-            score = self.run_game(game, framerate=framerate)
-            scores.append(score)
+            self.run_game(game, framerate=framerate)
+            scores.append(game.score)
 
             game.reset()
+
+        print(f"Average score: {sum(scores) / len(scores)}")
+        print(f"Max score: {max(scores)}")
+        print(f"Min score: {min(scores)}")
+        print("Press any key to exit.")
+        input()
