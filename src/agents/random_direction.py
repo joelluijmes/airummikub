@@ -3,7 +3,7 @@ from src.pong import Game
 from .base import BaseAgent
 
 
-class RandomAgent(BaseAgent):
+class RandomDirectionAgent(BaseAgent):
     def run_game(self, game: Game, framerate: int):
         while not game.completed:
             game.tick()
@@ -17,5 +17,5 @@ class RandomAgent(BaseAgent):
 
 
 if __name__ == "__main__":
-    agent = RandomAgent()
+    agent = RandomDirectionAgent()
     agent.run_simulation(100)

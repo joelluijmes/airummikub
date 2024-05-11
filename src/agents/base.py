@@ -9,7 +9,7 @@ class BaseAgent:
 
     def run_simulation(self, num_games: int):
         scores = []
-        framerate = 1000
+        framerate = 100
         game = Game(framerate=framerate)
 
         for _ in range(num_games):
