@@ -4,7 +4,7 @@ import pygame
 import random
 
 
-SIZE = WIDTH, HEIGHT = 800, 600
+SIZE = WIDTH, HEIGHT = 600, 400
 PADDLE_OFFSET = 25
 WALL_WIDTH = 10
 
@@ -15,7 +15,7 @@ RED = 255, 0, 0
 
 
 class Paddle(pygame.sprite.Sprite):
-    SPEED = 8
+    SPEED = 10
 
     def __init__(self, color, width, height, left_position):
         super().__init__()
@@ -35,7 +35,7 @@ class Paddle(pygame.sprite.Sprite):
         if keys[pygame.K_DOWN]:
             self.move("down")
 
-    def move(self, direction: Literal["up", "down"]):
+    def move(self, direction: Literal["up", "down"] | None):
         if direction == "up" and self.rect.y > WALL_WIDTH:
             self.rect.y -= self.SPEED
         if direction == "down" and self.rect.y < HEIGHT - self.rect.height - WALL_WIDTH:
@@ -92,14 +92,15 @@ class Game:
         self.framerate = framerate
         self.score = 0
         self.top_score = 0
+        self.num_games = 0
 
         self.reset()
 
     def reset(self):
         self.completed = False
         self.num_ticks = 0
-        self.num_paddle_hits = 0
         self.score = 0
+        self.num_games += 1
 
         self.paddle.rect.y = HEIGHT // 2 - self.paddle.rect.height // 2
         self.ball.rect.x = WIDTH // 2
@@ -111,17 +112,22 @@ class Game:
             self.tick()
             self.clock.tick(self.framerate)
 
-    def tick(self):
+    def tick(self) -> int:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
 
         # Check for game over
-        if self.ball.rect.left < 0:
+        if self.ball.rect.left < 0 or self.completed:
             self.screen.fill(color=RED)
             pygame.display.flip()
             self.completed = True
-            return
+            return -1000
+
+        if abs(self.ball.rect.centery - self.paddle.rect.centery) < self.paddle.rect.height // 2:
+            reward = 5
+        else:
+            reward = -1
 
         # Check for collisions
         if pygame.sprite.spritecollide(self.ball, [self.wall_right], False):
@@ -132,7 +138,8 @@ class Game:
             self.ball.speed[0] *= -1
             # Ensure the ball is outside the paddle, thereby preventing multiple hits
             self.ball.rect.x = PADDLE_OFFSET + self.paddle.rect.width * 2
-            self.num_paddle_hits += 1
+
+            reward = 100
 
         # Redraw the screen
         self.sprites.update()
@@ -140,16 +147,21 @@ class Game:
         self.sprites.draw(self.screen)
 
         # Render stats
-        self.score = self.num_paddle_hits * 50 + self.num_ticks // 50
-        score_text = self.font.render(f"Score:         {self.score:09d}", True, WHITE)
-        self.screen.blit(score_text, (10, 10))
+        num_games_text = self.font.render(f"{'Game':<15}: {self.num_games:09d}", True, WHITE)
+        self.screen.blit(num_games_text, (10, 10))
+
+        score_text = self.font.render(f"{'Score':<15}: {self.score:09d}", True, WHITE)
+        self.screen.blit(score_text, (10, 25))
 
         self.top_score = max(self.score, self.top_score)
-        top_score_text = self.font.render(f"Top Score: {self.top_score:09d}", True, WHITE)
-        self.screen.blit(top_score_text, (10, 25))
+        top_score_text = self.font.render(f"{'Top Score':<15}: {self.top_score:09d}", True, WHITE)
+        self.screen.blit(top_score_text, (10, 40))
 
         pygame.display.flip()
         self.num_ticks += 1
+        self.score += reward
+
+        return reward
 
 
 def main():

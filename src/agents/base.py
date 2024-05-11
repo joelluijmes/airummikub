@@ -3,20 +3,22 @@ from src.pong import Game
 
 
 class BaseAgent:
+    game: Game
+
     @abc.abstractmethod
     def run_game(self, game: Game, framerate: int) -> int:
         raise NotImplementedError("Method run_game not implemented")
 
     def run_simulation(self, num_games: int):
         scores = []
-        framerate = 100
-        game = Game(framerate=framerate)
+        framerate = 60
+        self.game = Game(framerate=framerate)
 
         for _ in range(num_games):
-            self.run_game(game, framerate=framerate)
-            scores.append(game.score)
+            self.run_game(self.game, framerate=framerate)
+            scores.append(self.game.score)
 
-            game.reset()
+            self.game.reset()
 
         print(f"Average score: {sum(scores) / len(scores)}")
         print(f"Max score: {max(scores)}")
