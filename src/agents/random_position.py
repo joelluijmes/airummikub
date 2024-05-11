@@ -1,10 +1,12 @@
 import random
+
 from src.pong import Game
+
 from .base import BaseAgent
 
 
 class RandomDirectionAgent(BaseAgent):
-    def run_game(self, game: Game, framerate: int):
+    def run_game(self, game: Game, framerate: int) -> None:
 
         target_destination = random.randint(0, game.screen.get_height() - game.paddle.rect.height)
         margin = game.paddle.rect.height // 2

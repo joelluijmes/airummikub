@@ -1,8 +1,8 @@
+import random
 import sys
 from typing import Literal
-import pygame
-import random
 
+import pygame
 
 SIZE = WIDTH, HEIGHT = 600, 400
 PADDLE_OFFSET = 25
@@ -17,7 +17,7 @@ RED = 255, 0, 0
 class Paddle(pygame.sprite.Sprite):
     SPEED = 10
 
-    def __init__(self, color, width, height, left_position):
+    def __init__(self, color: tuple, width: int, height: int, left_position: int):
         super().__init__()
 
         self.image = pygame.Surface([width, height])
@@ -27,7 +27,7 @@ class Paddle(pygame.sprite.Sprite):
         self.rect.y = HEIGHT // 2 - self.rect.height // 2
         self.rect.left = left_position
 
-    def update(self):
+    def update(self) -> None:
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_UP]:
@@ -35,7 +35,7 @@ class Paddle(pygame.sprite.Sprite):
         if keys[pygame.K_DOWN]:
             self.move("down")
 
-    def move(self, direction: Literal["up", "down"] | None):
+    def move(self, direction: Literal["up", "down"] | None) -> None:
         if direction == "up" and self.rect.y > WALL_WIDTH:
             self.rect.y -= self.SPEED
         if direction == "down" and self.rect.y < HEIGHT - self.rect.height - WALL_WIDTH:
@@ -43,7 +43,7 @@ class Paddle(pygame.sprite.Sprite):
 
 
 class Wall(pygame.sprite.Sprite):
-    def __init__(self, color, width, height, x, y):
+    def __init__(self, color: tuple, width: int, height: int, x: int, y: int):
         super().__init__()
 
         self.image = pygame.Surface([width, height])
@@ -55,7 +55,7 @@ class Wall(pygame.sprite.Sprite):
 
 
 class Ball(pygame.sprite.Sprite):
-    def __init__(self, color, radius):
+    def __init__(self, color: tuple, radius: int):
         super().__init__()
 
         self.image = pygame.Surface([radius * 2, radius * 2])
@@ -63,12 +63,12 @@ class Ball(pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect()
 
-    def update(self):
+    def update(self) -> None:
         self.rect = self.rect.move(self.speed)
 
 
 class Game:
-    def __init__(self, framerate=60):
+    def __init__(self, framerate: int = 60):
         pygame.init()
 
         self.screen = pygame.display.set_mode(SIZE)
@@ -96,7 +96,7 @@ class Game:
 
         self.reset()
 
-    def reset(self):
+    def reset(self) -> None:
         self.completed = False
         self.num_ticks = 0
         self.score = 0
@@ -107,7 +107,7 @@ class Game:
         self.ball.rect.y = HEIGHT // 2
         self.ball.speed = random.choice([[5, 5], [-5, 5], [5, -5], [-5, -5]])
 
-    def run(self):
+    def run(self) -> None:
         while True:
             self.tick()
             self.clock.tick(self.framerate)
@@ -164,7 +164,7 @@ class Game:
         return reward
 
 
-def main():
+def main() -> None:
     game = Game()
     game.run()
 

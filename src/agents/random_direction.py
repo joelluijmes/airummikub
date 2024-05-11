@@ -1,10 +1,12 @@
 import random
+
 from src.pong import Game
+
 from .base import BaseAgent
 
 
 class RandomDirectionAgent(BaseAgent):
-    def run_game(self, game: Game, framerate: int):
+    def run_game(self, game: Game, framerate: int) -> None:
         while not game.completed:
             game.tick()
 

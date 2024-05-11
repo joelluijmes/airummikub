@@ -1,21 +1,23 @@
 import random
+from typing import Literal
+
 import pygame
 
-from typing import Literal
 from src.pong import Game
+
 from .base import BaseAgent
 
 
 class QLearningAgent(BaseAgent):
-    actions = ["up", "down", None]
+    actions = ["up", "down", None]  # noqa: RUF012
+    q_table = {}  # noqa: RUF012
+
     exploration_rate = 1.0
     exploration_decay = 0.975
     learning_rate = 0.1
     discount_factor = 0.99
-    q_table = {}
 
-    def run_game(self, game: Game, framerate: int):
-
+    def run_game(self, game: Game, framerate: int) -> None:
         while not game.completed:
             if pygame.key.get_pressed()[pygame.K_SPACE]:
                 game.clock.tick(framerate)
@@ -46,7 +48,7 @@ class QLearningAgent(BaseAgent):
         # Update the exploration rate
         self.exploration_rate *= self.exploration_decay
 
-    def get_current_state(self):
+    def get_current_state(self) -> tuple:
         return (
             self.game.paddle.rect.y // 5,
             self.game.ball.rect.y // 5,

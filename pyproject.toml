@@ -10,6 +10,50 @@ python = "^3.12"
 pygame = "^2.5.2"
 
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.4.4"
+black = "^24.4.2"
+poethepoet = "^0.26.1"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+## Configuration of linting and formatting tools
+[tool.black]
+## Configuration of linting and formatting tools
+line-length = 140
+
+[tool.ruff]
+lint.select = [
+    "A",   # prevent using keywords that clobber python builtins
+    "ANN", # enforce annotations
+    "B",   # bugbear: security warnings
+    "E",   # pycodestyle
+    "F",   # pyflakes
+    "I",   # import order
+    "ISC", # implicit string concatenation
+    "RUF", # the ruff developer's own rules
+    "S",   # bandit: security warnings 
+    "UP",  # alert you when better syntax is available in your python version
+]
+
+lint.ignore = [
+    "ANN101", # Missing type annotation for self in method
+    "ANN102", # Missing type annotation for cls in classmethod
+    "ANN204", # Missing return type annotation for special method `__init__`
+    "E501",   # Line too long, we use black for that
+    "B008",   # Do not perform function call `XXX` in argument defaults, FastAPI Dependency Injection uses this
+    "S311",   # Standard pseudo-random generators are not suitable for security/cryptographic purposes
+]
+lint.unfixable = ["B"] # Avoid trying to fix bugbear rules
+
+
+## Configuration of poethepoet scripts
+[tool.poe.tasks]
+_black = "black src/"
+_ruff = "ruff check src/ --fix"
+
+[tool.poe.tasks.lint]
+sequence = ["_black", "_ruff"]
+help = "Runs linting tools (black and ruff) on the project"
