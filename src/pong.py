@@ -130,6 +130,8 @@ class Game:
             self.ball.speed[1] *= -1
         if pygame.sprite.spritecollide(self.ball, [self.paddle], False):
             self.ball.speed[0] *= -1
+            # Ensure the ball is outside the paddle, thereby preventing multiple hits
+            self.ball.rect.x = PADDLE_OFFSET + self.paddle.rect.width * 2
             self.num_paddle_hits += 1
 
         # Redraw the screen
