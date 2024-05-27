@@ -9,8 +9,8 @@ from .base import BaseAgent
 
 
 class QLearningAgent(BaseAgent):
-    actions = ["up", "down", None]  # noqa: RUF012
-    q_table = {}  # noqa: RUF012
+    actions = ["up", "down", None]
+    q_table = {}
 
     exploration_rate = 1.0
     exploration_decay = 0.975

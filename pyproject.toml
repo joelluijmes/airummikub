@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 pygame = "^2.5.2"
+torch = "^2.3.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -45,6 +46,7 @@ lint.ignore = [
     "E501",   # Line too long, we use black for that
     "B008",   # Do not perform function call `XXX` in argument defaults, FastAPI Dependency Injection uses this
     "S311",   # Standard pseudo-random generators are not suitable for security/cryptographic purposes
+    "RUF012", # Checks for mutable default values in class attributes.
 ]
 lint.unfixable = ["B"] # Avoid trying to fix bugbear rules
 
